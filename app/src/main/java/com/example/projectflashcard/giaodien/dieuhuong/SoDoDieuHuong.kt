@@ -43,7 +43,7 @@ fun SoDoDieuHuong(
 
         composable(ManHinh.QuanLyBoThe.route) {
             QuanLyBoTheScreen(
-                onQuayLai = { navController.popBackStack() },
+                onQuayLai = { navController.quayLaiHoacVeTrangChu() },
                 onMoChiTiet = { boTheId ->
                     navController.navigate(ManHinh.ChiTietBoThe.taoDuongDan(boTheId))
                 }
@@ -61,7 +61,7 @@ fun SoDoDieuHuong(
             val boTheId = backStackEntry.arguments?.getInt(ManHinh.ChiTietBoThe.BO_THE_ID) ?: 1
             ChiTietBoTheScreen(
                 boTheId = boTheId,
-                onQuayLai = { navController.popBackStack() },
+                onQuayLai = { navController.quayLaiHoacVeTrangChu() },
                 onThemTuVung = { id -> navController.navigate(ManHinh.ThemSuaTuVung.taoDuongDan(id)) },
                 onOnTapBoThe = { id -> navController.navigate(ManHinh.OnTapFlashcard.taoDuongDan(id)) }
             )
@@ -78,7 +78,7 @@ fun SoDoDieuHuong(
             val boTheId = backStackEntry.arguments?.getInt(ManHinh.ThemSuaTuVung.BO_THE_ID) ?: 1
             ThemSuaTuVungScreen(
                 boTheId = boTheId,
-                onQuayLai = { navController.popBackStack() }
+                onQuayLai = { navController.quayVeChiTietBoThe(boTheId) }
             )
         }
 
@@ -95,24 +95,43 @@ fun SoDoDieuHuong(
                 ?.takeIf { it > 0 }
             OnTapFlashcardScreen(
                 boTheId = boTheId,
-                onQuayLai = { navController.popBackStack() }
+                onQuayLai = { navController.quayLaiHoacVeTrangChu() }
             )
         }
 
         composable(ManHinh.ThongKeHocTap.route) {
-            ThongKeHocTapScreen(onQuayLai = { navController.popBackStack() })
+            ThongKeHocTapScreen(onQuayLai = { navController.quayLaiHoacVeTrangChu() })
         }
 
         composable(ManHinh.TimKiemTuVung.route) {
-            TimKiemTuVungScreen(onQuayLai = { navController.popBackStack() })
+            TimKiemTuVungScreen(onQuayLai = { navController.quayLaiHoacVeTrangChu() })
         }
 
         composable(ManHinh.CaiDat.route) {
-            CaiDatScreen(onQuayLai = { navController.popBackStack() })
+            CaiDatScreen(onQuayLai = { navController.quayLaiHoacVeTrangChu() })
         }
 
         composable(ManHinh.GioiThieu.route) {
-            GioiThieuScreen(onQuayLai = { navController.popBackStack() })
+            GioiThieuScreen(onQuayLai = { navController.quayLaiHoacVeTrangChu() })
+        }
+    }
+}
+
+private fun NavHostController.quayLaiHoacVeTrangChu() {
+    if (!popBackStack()) {
+        navigate(ManHinh.TrangChu.route) {
+            launchSingleTop = true
+        }
+    }
+}
+
+private fun NavHostController.quayVeChiTietBoThe(boTheId: Int) {
+    if (!popBackStack() || currentDestination?.route != ManHinh.ChiTietBoThe.route) {
+        navigate(ManHinh.ChiTietBoThe.taoDuongDan(boTheId)) {
+            launchSingleTop = true
+            popUpTo(ManHinh.TrangChu.route) {
+                inclusive = false
+            }
         }
     }
 }

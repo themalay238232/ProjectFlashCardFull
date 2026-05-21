@@ -1,5 +1,6 @@
 package com.example.projectflashcard.giaodien.chucnang.themsuatuvung
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -25,6 +26,8 @@ fun ThemSuaTuVungScreen(
     boTheId: Int,
     onQuayLai: () -> Unit
 ) {
+    BackHandler(onBack = onQuayLai)
+
     Scaffold(
         topBar = {
             ThanhTieuDe(
