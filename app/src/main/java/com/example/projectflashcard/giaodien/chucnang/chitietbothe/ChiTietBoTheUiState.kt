@@ -1,8 +1,5 @@
 package com.example.projectflashcard.giaodien.chucnang.chitietbothe
 
-
-
-//cấu trúc khá giống struct dùng để lưu thông tin
 data class ChiTietBoTheUiState(
     val boTheId: Int,
     val tenBoThe: String,

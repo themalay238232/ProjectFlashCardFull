@@ -69,6 +69,9 @@ fun SoDoDieuHuong(
                 boTheId = boTheId,
                 onQuayLai = { navController.quayLaiHoacVeTrangChu() },
                 onThemTuVung = { id -> navController.navigate(ManHinh.ThemSuaTuVung.taoDuongDan(id)) },
+                onSuaTuVung = { id, tuVungId ->
+                    navController.navigate(ManHinh.ThemSuaTuVung.taoDuongDan(id, tuVungId))
+                },
                 onOnTapBoThe = { id -> navController.navigate(ManHinh.OnTapFlashcard.taoDuongDan(id)) }
             )
         }
@@ -78,12 +81,20 @@ fun SoDoDieuHuong(
             arguments = listOf(
                 navArgument(ManHinh.ThemSuaTuVung.BO_THE_ID) {
                     type = NavType.IntType
+                },
+                navArgument(ManHinh.ThemSuaTuVung.TU_VUNG_ID) {
+                    type = NavType.LongType
+                    defaultValue = -1L
                 }
             )
         ) { backStackEntry ->
             val boTheId = backStackEntry.arguments?.getInt(ManHinh.ThemSuaTuVung.BO_THE_ID) ?: 1
+            val tuVungId = backStackEntry.arguments
+                ?.getLong(ManHinh.ThemSuaTuVung.TU_VUNG_ID)
+                ?.takeIf { it > 0 }
             ThemSuaTuVungScreen(
                 boTheId = boTheId,
+                tuVungId = tuVungId,
                 onQuayLai = { navController.quayVeChiTietBoThe(boTheId) }
             )
         }

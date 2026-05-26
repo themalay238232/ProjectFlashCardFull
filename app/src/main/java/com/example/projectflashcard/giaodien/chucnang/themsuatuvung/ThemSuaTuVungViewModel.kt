@@ -7,14 +7,17 @@ import com.example.projectflashcard.dulieu.cucbo.cosodulieu.CoSoDuLieuLearnFlash
 import com.example.projectflashcard.dulieu.khodulieu.KhoDuLieuFlashcard
 import com.example.projectflashcard.nghiepvu.kieudulieu.TuVung
 import com.example.projectflashcard.nghiepvu.khodulieu.KhoFlashcard
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ThemSuaTuVungViewModel(application: Application) : AndroidViewModel(application) {
     private val kho: KhoFlashcard
+    private var congViecTai: Job? = null
 
     private val _uiState = MutableStateFlow(ThemSuaTuVungUiState())
     val uiState: StateFlow<ThemSuaTuVungUiState> = _uiState.asStateFlow()
@@ -24,8 +27,46 @@ class ThemSuaTuVungViewModel(application: Application) : AndroidViewModel(applic
         kho = KhoDuLieuFlashcard(db.truyVanBoThe(), db.truyVanTuVung())
     }
 
-    fun taiBoThe(boTheId: Int) {
-        _uiState.update { it.copy(boTheId = boTheId, daLuu = false, thongBaoLoi = null) }
+    fun taiDuLieu(boTheId: Int, tuVungId: Long?) {
+        congViecTai?.cancel()
+        congViecTai = viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    boTheId = boTheId,
+                    tuVungId = tuVungId,
+                    dangTai = true,
+                    daLuu = false,
+                    thongBaoLoi = null
+                )
+            }
+
+            val boThe = kho.layBoTheTheoId(boTheId.toLong()).first()
+            val tuVung = tuVungId?.let { kho.layTuVungTheoId(it).first() }
+
+            _uiState.update { state ->
+                if (tuVung == null) {
+                    state.copy(
+                        tenBoThe = boThe?.tenBoThe ?: "Bộ thẻ #$boTheId",
+                        tuVungGoc = null,
+                        tu = "",
+                        nghia = "",
+                        phienAm = "",
+                        viDu = "",
+                        dangTai = false
+                    )
+                } else {
+                    state.copy(
+                        tenBoThe = boThe?.tenBoThe ?: "Bộ thẻ #$boTheId",
+                        tuVungGoc = tuVung,
+                        tu = tuVung.tu,
+                        nghia = tuVung.nghia,
+                        phienAm = tuVung.phienAm,
+                        viDu = tuVung.viDu,
+                        dangTai = false
+                    )
+                }
+            }
+        }
     }
 
     fun doiTu(tu: String) {
@@ -50,33 +91,55 @@ class ThemSuaTuVungViewModel(application: Application) : AndroidViewModel(applic
         val nghia = state.nghia.trim()
 
         if (tu.isEmpty()) {
-            _uiState.update { it.copy(thongBaoLoi = "Tu vung khong duoc de trong") }
+            _uiState.update { it.copy(thongBaoLoi = "Từ vựng không được để trống") }
             return
         }
         if (nghia.isEmpty()) {
-            _uiState.update { it.copy(thongBaoLoi = "Nghia khong duoc de trong") }
+            _uiState.update { it.copy(thongBaoLoi = "Nghĩa tiếng Việt không được để trống") }
             return
         }
 
         viewModelScope.launch {
             _uiState.update { it.copy(dangLuu = true, thongBaoLoi = null) }
             runCatching {
-                kho.themTuVung(
-                    TuVung(
-                        boTheId = state.boTheId.toLong(),
-                        tu = tu,
-                        nghia = nghia,
-                        phienAm = state.phienAm.trim(),
-                        viDu = state.viDu.trim()
+                val tuVungGoc = state.tuVungGoc
+                val biTrung = kho.layTuVungTheoBoThe(state.boTheId.toLong())
+                    .first()
+                    .any { tuVung ->
+                        tuVung.tu.trim().equals(tu, ignoreCase = true) && tuVung.id != tuVungGoc?.id
+                    }
+
+                if (biTrung) {
+                    error("Từ này đã tồn tại trong bộ thẻ hiện tại")
+                }
+
+                if (tuVungGoc == null) {
+                    kho.themTuVung(
+                        TuVung(
+                            boTheId = state.boTheId.toLong(),
+                            tu = tu,
+                            nghia = nghia,
+                            phienAm = state.phienAm.trim(),
+                            viDu = state.viDu.trim()
+                        )
                     )
-                )
+                } else {
+                    kho.suaTuVung(
+                        tuVungGoc.copy(
+                            tu = tu,
+                            nghia = nghia,
+                            phienAm = state.phienAm.trim(),
+                            viDu = state.viDu.trim()
+                        )
+                    )
+                }
             }.onSuccess {
                 _uiState.update { it.copy(dangLuu = false, daLuu = true) }
             }.onFailure { loi ->
                 _uiState.update {
                     it.copy(
                         dangLuu = false,
-                        thongBaoLoi = loi.message ?: "Khong luu duoc tu vung"
+                        thongBaoLoi = loi.message ?: "Không lưu được từ vựng"
                     )
                 }
             }

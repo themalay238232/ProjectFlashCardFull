@@ -1,4 +1,5 @@
 package com.example.projectflashcard.giaodien.chucnang.chitietbothe
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -37,6 +38,7 @@ fun ChiTietBoTheScreen(
     boTheId: Int,
     onQuayLai: () -> Unit,
     onThemTuVung: (Int) -> Unit,
+    onSuaTuVung: (Int, Long) -> Unit,
     onOnTapBoThe: (Int) -> Unit,
     viewModel: ChiTietBoTheViewModel = viewModel()
 ) {
@@ -60,7 +62,7 @@ fun ChiTietBoTheScreen(
         },
         onSuaTuVung = { tuVung ->
             viewModel.xuLySuKien(ChiTietBoTheEvent.BamSuaTuVung(tuVung))
-            onThemTuVung(boTheId)
+            onSuaTuVung(boTheId, tuVung.id)
         }
     )
 }

@@ -23,18 +23,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.projectflashcard.giaodien.chude.ChuDeLearnFlash
+import com.example.projectflashcard.giaodien.thanhphan.DangTai
 import com.example.projectflashcard.giaodien.thanhphan.ThanhTieuDe
 
 @Composable
 fun ThemSuaTuVungScreen(
     boTheId: Int,
+    tuVungId: Long?,
     onQuayLai: () -> Unit,
     viewModel: ThemSuaTuVungViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    LaunchedEffect(boTheId) {
-        viewModel.taiBoThe(boTheId)
+    LaunchedEffect(boTheId, tuVungId) {
+        viewModel.taiDuLieu(boTheId, tuVungId)
     }
 
     LaunchedEffect(uiState.daLuu) {
@@ -66,15 +68,26 @@ private fun ThemSuaTuVungNoiDung(
     onDoiViDu: (String) -> Unit,
     onLuu: () -> Unit
 ) {
+    val dangSua = uiState.tuVungId != null
+
     Scaffold(
         topBar = {
             ThanhTieuDe(
-                tieuDe = "Them tu vung",
+                tieuDe = if (dangSua) "Sửa từ vựng" else "Thêm từ vựng",
                 coNutQuayLai = true,
                 onQuayLai = onQuayLai
             )
         }
     ) { innerPadding ->
+        if (uiState.dangTai) {
+            DangTai(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            )
+            return@Scaffold
+        }
+
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -84,7 +97,11 @@ private fun ThemSuaTuVungNoiDung(
         ) {
             item {
                 Text(
-                    text = "Bo the #${uiState.boTheId}",
+                    text = if (dangSua) {
+                        "Đang sửa từ trong bộ: ${uiState.tenBoThe}"
+                    } else {
+                        "Đang thêm từ vào bộ: ${uiState.tenBoThe}"
+                    },
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -94,28 +111,28 @@ private fun ThemSuaTuVungNoiDung(
                     OutlinedTextField(
                         value = uiState.tu,
                         onValueChange = onDoiTu,
-                        label = { Text("Tu tieng Anh") },
+                        label = { Text("Từ tiếng Anh") },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth()
                     )
                     OutlinedTextField(
                         value = uiState.nghia,
                         onValueChange = onDoiNghia,
-                        label = { Text("Nghia tieng Viet") },
+                        label = { Text("Nghĩa tiếng Việt") },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth()
                     )
                     OutlinedTextField(
                         value = uiState.phienAm,
                         onValueChange = onDoiPhienAm,
-                        label = { Text("Phien am") },
+                        label = { Text("Phiên âm") },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth()
                     )
                     OutlinedTextField(
                         value = uiState.viDu,
                         onValueChange = onDoiViDu,
-                        label = { Text("Vi du") },
+                        label = { Text("Ví dụ") },
                         minLines = 3,
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -136,7 +153,7 @@ private fun ThemSuaTuVungNoiDung(
                     enabled = !uiState.dangLuu,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = if (uiState.dangLuu) "Dang luu..." else "Luu tu vung")
+                    Text(text = if (uiState.dangLuu) "Đang lưu..." else "Lưu từ vựng")
                 }
             }
             item {
@@ -145,7 +162,7 @@ private fun ThemSuaTuVungNoiDung(
                     enabled = !uiState.dangLuu,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = "Huy")
+                    Text(text = "Hủy")
                 }
             }
         }
@@ -157,7 +174,7 @@ private fun ThemSuaTuVungNoiDung(
 private fun ThemSuaTuVungScreenPreview() {
     ChuDeLearnFlash {
         ThemSuaTuVungNoiDung(
-            uiState = ThemSuaTuVungUiState(boTheId = 1),
+            uiState = ThemSuaTuVungUiState(boTheId = 1, tenBoThe = "English A1"),
             onQuayLai = {},
             onDoiTu = {},
             onDoiNghia = {},

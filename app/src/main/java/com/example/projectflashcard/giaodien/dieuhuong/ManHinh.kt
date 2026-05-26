@@ -13,10 +13,20 @@ sealed class ManHinh(
         fun taoDuongDan(boTheId: Int): String = "chi_tiet_bo_the/$boTheId"
     }
 
-    data object ThemSuaTuVung : ManHinh("them_sua_tu_vung/{boTheId}", "Thêm / sửa từ vựng") {
+    data object ThemSuaTuVung : ManHinh(
+        "them_sua_tu_vung/{boTheId}?tuVungId={tuVungId}",
+        "Thêm / sửa từ vựng"
+    ) {
         const val BO_THE_ID = "boTheId"
+        const val TU_VUNG_ID = "tuVungId"
 
-        fun taoDuongDan(boTheId: Int): String = "them_sua_tu_vung/$boTheId"
+        fun taoDuongDan(boTheId: Int, tuVungId: Long? = null): String {
+            return if (tuVungId == null) {
+                "them_sua_tu_vung/$boTheId"
+            } else {
+                "them_sua_tu_vung/$boTheId?tuVungId=$tuVungId"
+            }
+        }
     }
 
     data object OnTapFlashcard : ManHinh("on_tap_flashcard?boTheId={boTheId}", "Ôn tập Flashcard") {
@@ -36,4 +46,3 @@ sealed class ManHinh(
     data object CaiDat : ManHinh("cai_dat", "Cài đặt")
     data object GioiThieu : ManHinh("gioi_thieu", "Giới thiệu")
 }
-

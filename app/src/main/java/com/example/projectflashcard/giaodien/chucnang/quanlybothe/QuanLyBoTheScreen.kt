@@ -94,10 +94,11 @@ fun QuanLyBoTheScreen(
 
                 uiState.danhSach.isEmpty() -> TrangThaiRong(
                     tieuDe = "Chưa có bộ thẻ nào",
-                    moTa = if (uiState.tuKhoaTimKiem.isBlank())
+                    moTa = if (uiState.tuKhoaTimKiem.isBlank()) {
                         "Nhấn nút + để tạo bộ thẻ đầu tiên"
-                    else
-                        "Không tìm thấy bộ thẻ nào khớp với \"${uiState.tuKhoaTimKiem}\"",
+                    } else {
+                        "Không tìm thấy bộ thẻ nào khớp với \"${uiState.tuKhoaTimKiem}\""
+                    },
                     modifier = Modifier.fillMaxSize()
                 )
 

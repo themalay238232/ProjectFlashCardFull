@@ -45,7 +45,9 @@ fun HopThoaiBoThe(
                     isError = thongBaoLoi != null,
                     supportingText = if (thongBaoLoi != null) {
                         { Text(text = thongBaoLoi, color = MaterialTheme.colorScheme.error) }
-                    } else null,
+                    } else {
+                        null
+                    },
                     modifier = Modifier.fillMaxWidth()
                 )
                 OutlinedTextField(

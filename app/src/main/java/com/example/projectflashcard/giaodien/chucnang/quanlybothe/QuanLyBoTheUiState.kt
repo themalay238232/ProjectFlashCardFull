@@ -7,12 +7,8 @@ data class QuanLyBoTheUiState(
     val tuKhoaTimKiem: String = "",
     val dangTai: Boolean = true,
     val thongBaoLoi: String? = null,
-
-    // Hộp thoại thêm / sửa
     val hienThiHopThoai: Boolean = false,
-    val boTheChinhSua: BoThe? = null,   // null = đang thêm mới
-
-    // Xác nhận xóa
+    val boTheChinhSua: BoThe? = null,
     val hienThiXacNhanXoa: Boolean = false,
     val boTheSeXoa: BoThe? = null
 )
