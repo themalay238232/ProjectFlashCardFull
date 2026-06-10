@@ -18,6 +18,8 @@ interface KhoFlashcard {
 
     suspend fun xoaBoThe(boThe: BoThe)
 
+    fun layTatCaTuVung(): Flow<List<TuVung>>
+
     fun layTuVungTheoBoThe(boTheId: Long): Flow<List<TuVung>>
 
     fun layTuVungTheoId(id: Long): Flow<TuVung?>

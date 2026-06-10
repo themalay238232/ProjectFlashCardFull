@@ -35,6 +35,9 @@ class KhoDuLieuFlashcard(
     override suspend fun xoaBoThe(boThe: BoThe) =
         truyVanBoThe.xoa(boThe.thanhBangBoThe())
 
+    override fun layTatCaTuVung(): Flow<List<TuVung>> =
+        truyVanTuVung.layTatCa().map { ds -> ds.map { it.thanhTuVung() } }
+
     override fun layTuVungTheoBoThe(boTheId: Long): Flow<List<TuVung>> =
         truyVanTuVung.layTheoBoThe(boTheId).map { ds -> ds.map { it.thanhTuVung() } }
 
