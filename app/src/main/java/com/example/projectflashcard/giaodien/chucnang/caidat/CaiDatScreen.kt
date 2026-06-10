@@ -23,6 +23,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -36,6 +37,7 @@ import com.example.projectflashcard.giaodien.thanhphan.ThanhTieuDe
 import com.example.projectflashcard.nghiepvu.kiemtra.KiemTraCaiDat
 import com.example.projectflashcard.nghiepvu.kieudulieu.CheDoGiaoDien
 import kotlin.math.roundToInt
+import kotlinx.coroutines.delay
 
 @Composable
 fun CaiDatScreen(
@@ -57,6 +59,13 @@ private fun CaiDatNoiDung(
     onQuayLai: () -> Unit,
     onEvent: (CaiDatEvent) -> Unit
 ) {
+    LaunchedEffect(uiState.thongBaoThanhCong, uiState.thongBaoLoi) {
+        if (uiState.thongBaoThanhCong != null || uiState.thongBaoLoi != null) {
+            delay(2000)
+            onEvent(CaiDatEvent.XoaThongBao)
+        }
+    }
+
     Scaffold(
         topBar = {
             ThanhTieuDe(
