@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-
 class OnTapFlashcardViewModel(application: Application) : AndroidViewModel(application) {
     private val kho: KhoFlashcard
     private var congViecTai: Job? = null
